@@ -1,0 +1,5 @@
+check50: true
+
+#check50:
+#  checks: test.py
+#  checks: __init__.py

@@ -1,0 +1,45 @@
+name: Autograding Tests
+on:
+  push: {}
+  repository_dispatch: {}
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-autograding-tests:
+    container:
+      image: python:3.12-slim
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # Check out repo first
+
+      - name: Install dependencies (node, git, jq)
+        run: |
+          apt-get update
+          apt-get install -y nodejs git jq
+          apt-get clean
+          rm -rf /var/lib/apt/lists/*
+
+      - name: test
+        id: test
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: test
+          setup-command: |
+            pip uninstall -y check50
+            pip install --no-cache-dir git+https://github.com/dhodcz2/check50.git
+          command: check50 ./test --dev -o json --autograder ./autograder/test.json --feedback ./feedback/test.txt
+
+      - name: Assign file contents to TEST_RESULTS
+        run: |
+          # If the reporter expects base64-encoded JSON, store it that way:
+          echo "TEST_RESULTS=$(base64 -w0 ./test.json)" >> $GITHUB_ENV
+
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          TEST_RESULTS: ${{ env.TEST_RESULTS }}
+        with:
+          runners: test
