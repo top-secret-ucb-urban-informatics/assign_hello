@@ -1,4 +1,7 @@
 import check50
+
+# implement checks here
+
 if False:
     # Here just as an example
     def hello(*args, **kwargs):
@@ -16,4 +19,3 @@ if False:
                      "Literally just print('Hello, world!')"
             )
         return result
-
