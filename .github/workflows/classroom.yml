@@ -42,13 +42,6 @@ jobs:
         run: |
           echo "TEST_RESULTS=$(base64 -w0 ./autograder/test.json)" >> $GITHUB_ENV
 
-      - name: Autograding Reporter
-        uses: classroom-resources/autograding-grading-reporter@v1
-        env:
-          TEST_RESULTS: ${{ env.TEST_RESULTS }}
-        with:
-          runners: test
-
       - name: Feedback
         if: ${{ always() }}  # Runs even if previous steps fail
         run: |
@@ -56,6 +49,12 @@ jobs:
           cat ./feedback/test.txt
         continue-on-error: true  # Ensures failure if the previous step failed
 
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          TEST_RESULTS: ${{ env.TEST_RESULTS }}
+        with:
+          runners: test
 # to test assignment:
 #  check50 ./test --dev -o json --autograder ./autograder/check50 --feedback ./feedback/check50
 # to test checks
