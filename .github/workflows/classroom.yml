@@ -56,7 +56,6 @@ jobs:
           cat ./feedback/test.txt
         continue-on-error: true  # Ensures failure if the previous step failed
 
-
 # to test assignment:
 #  check50 ./test --dev -o json --autograder ./autograder/check50 --feedback ./feedback/check50
 # to test checks
