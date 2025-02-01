@@ -27,6 +27,11 @@ jobs:
           ref: main
           path: secret
 
+      # Install the secret-tests package using its pyproject.toml
+      - name: Install secret tests package
+        run: |
+          pip install ./secret
+
       - name: Install dependencies (git, nodejs, check50)
         run: |
           apt-get update
