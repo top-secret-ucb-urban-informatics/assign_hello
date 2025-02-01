@@ -1,4 +1,3 @@
-# .github/workflows/autograding.yml
 name: Autograding Tests
 on:
   push: { }
@@ -14,22 +13,15 @@ jobs:
     container:
       image: python:3.12  # Running inside a Python container
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout student repository
-        uses: actions/checkout@v4
 
-      # New step: checkout the secret tests from a separate repository.
-      - name: Checkout secret tests repository
-        uses: actions/checkout@v4
-        with:
-          repository: top-secret-ucb-urban-informatics/secret-tests
-          token: ${{ secrets.SECRET_TESTS_TOKEN }}  # PAT with access to the secret repo.
-          path: secret  # This will place the secret tests in "./test"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4  # Fetch the repository code
 
       - name: Install dependencies (git, nodejs, check50)
         run: |
           apt-get update
-          apt-get install -y git nodejs npm
+          apt-get install -y git nodejs npm  # Install Git and Node.js
           python -m pip install --upgrade pip setuptools wheel check50
 
       - name: Install the Python project
@@ -44,18 +36,18 @@ jobs:
           setup-command: |
             pip uninstall -y check50
             pip install --no-cache-dir git+https://github.com/dhodcz2/check50.git
-          command: check50 ./secret/test --dev -o json --autograder ./autograder/test.json --feedback ./feedback/test.txt
+          command: check50 ./test --dev -o json --autograder ./autograder/test.json --feedback ./feedback/test.txt
 
       - name: Assign file contents to TEST_RESULTS
         run: |
           echo "TEST_RESULTS=$(base64 -w0 ./autograder/test.json)" >> $GITHUB_ENV
 
       - name: Feedback
-        if: ${{ always() }}
+        if: ${{ always() }}  # Runs even if previous steps fail
         run: |
           echo "### Feedback Output:"
           cat ./feedback/test.txt
-        continue-on-error: true
+        continue-on-error: true  # Ensures failure if the previous step failed
 
       - name: Autograding Reporter
         uses: classroom-resources/autograding-grading-reporter@v1
@@ -63,3 +55,10 @@ jobs:
           TEST_RESULTS: ${{ env.TEST_RESULTS }}
         with:
           runners: test
+
+# to test assignment:
+#  check50 ./test --dev -o json --autograder ./autograder/check50 --feedback ./feedback/check50
+# to test checks
+#  check50 ./test/meta --dev -o json --autograder ./autograder/check50 --feedback ./feedback/check50
+# to test workflow:
+#  act push -W .github/workflows/classroom.yml
