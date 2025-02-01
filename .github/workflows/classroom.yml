@@ -22,9 +22,10 @@ jobs:
       - name: Checkout secret tests repository
         uses: actions/checkout@v4
         with:
-          repository: top-secret-ucb-urban-informatics/secret-tests
+          repository: dhodcz2/secret-tests
           token: ${{ secrets.SECRET_TESTS_TOKEN }}  # PAT with access to the secret repo.
-          path: secret  # This will place the secret tests in "./test"
+          ref: main
+          path: secret
 
       - name: Install dependencies (git, nodejs, check50)
         run: |
